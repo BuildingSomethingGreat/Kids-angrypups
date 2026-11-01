@@ -40,7 +40,7 @@ jobs:
       - name: Collect game files
         run: |
           mkdir _site
-          cp -r index.html manifest.webmanifest css js vendor assets _site/
+          cp -r index.html behind-the-scenes.html manifest.webmanifest css js vendor assets _site/
           du -sh _site
       - uses: actions/upload-pages-artifact@v3
         with:

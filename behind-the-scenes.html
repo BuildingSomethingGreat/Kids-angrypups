@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17131d">
+  <meta name="description" content="Behind the scenes of my science fair project: How much force does it take to knock down a toy?">
+  <title>Behind the Scenes · Angry Pups</title>
+  <link rel="icon" type="image/png" href="assets/img/icon-192.png">
+  <style>
+    @font-face { font-family: 'Lilita One'; src: url('assets/fonts/LilitaOne-Regular.ttf') format('truetype'); font-display: swap; }
+    @font-face { font-family: 'Nunito'; src: url('assets/fonts/Nunito.ttf') format('truetype'); font-weight: 200 1000; font-display: swap; }
+    @font-face { font-family: 'Patrick Hand'; src: url('assets/fonts/PatrickHand-Regular.ttf') format('truetype'); font-display: swap; }
+
+    :root {
+      --board: #17131d;
+      --board-2: #221c2b;
+      --paper: #fffdf8;
+      --ink: #231c33;
+      --ink-2: #5b5070;
+      --magenta: #c8238a;
+      --pink: #ff2e93;
+      --purple: #6a2bb8;
+      --gold: #ffd23f;
+      --line: #e6dfee;
+      /* chart series: small / medium / large ball (validated on the white card) */
+      --s-small: #6250d6;
+      --s-medium: #1f9fbf;
+      --s-large: #e8247f;
+      --display: 'Lilita One', 'Arial Rounded MT Bold', system-ui, sans-serif;
+      --hand: 'Patrick Hand', 'Comic Sans MS', 'Chalkboard SE', cursive;
+      --body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      color: #fff;
+      font-family: var(--body);
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(200, 35, 138, .28), transparent 60%),
+        linear-gradient(180deg, var(--board-2), var(--board) 420px);
+      background-color: var(--board);
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; max-width: 100%; height: auto; }
+    a { color: inherit; }
+
+    /* ---------- top bar ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 5;
+      display: flex; align-items: center; gap: 10px;
+      padding: calc(env(safe-area-inset-top, 0px) + 10px) 16px 10px;
+      background: rgba(23, 19, 29, .82);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+    .back {
+      display: inline-flex; align-items: center; gap: 6px;
+      min-height: 40px; padding: 0 14px 0 10px; border-radius: 999px;
+      text-decoration: none; font-weight: 800; font-size: 14px;
+      background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14);
+    }
+    .back svg { width: 18px; height: 18px; fill: currentColor; }
+    .topbar img { height: 34px; width: auto; margin-left: auto; }
+
+    main { max-width: 760px; margin: 0 auto; padding: 0 16px calc(env(safe-area-inset-bottom, 0px) + 40px); }
+
+    /* ---------- hero ---------- */
+    .hero { text-align: center; padding: 28px 0 8px; }
+    .kicker { font-weight: 900; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: #ffc6ec; }
+    .sign {
+      display: inline-block; margin: 14px auto 6px; padding: 14px 22px 16px;
+      border-radius: 22px;
+      background: var(--purple);
+      box-shadow: 0 0 0 4px #3a1466, 0 16px 40px rgba(0, 0, 0, .45);
+      transform: rotate(-2deg);
+    }
+    .sign .l1 { display: block; font-family: var(--display); font-size: clamp(26px, 7vw, 40px); line-height: 1; color: var(--pink); letter-spacing: .02em; }
+    .sign .l2 { display: block; font-family: var(--display); font-size: clamp(64px, 19vw, 112px); line-height: .92; color: var(--pink); letter-spacing: .01em; text-shadow: 0 4px 0 #3a1466; }
+    .sign .l3 { display: block; font-family: var(--display); font-size: clamp(18px, 5vw, 28px); line-height: 1.1; color: var(--pink); letter-spacing: .04em; }
+    .byline { margin: 14px 0 0; font-family: var(--hand); font-size: 22px; color: #f4ecff; }
+
+    .polaroid {
+      margin: 22px auto 0; padding: 10px 10px 12px; max-width: 440px;
+      background: var(--paper); color: var(--ink);
+      border-radius: 6px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, .45);
+      transform: rotate(1.5deg);
+      position: relative;
+    }
+    .polaroid::before {
+      content: ''; position: absolute; top: -12px; left: 50%; width: 96px; height: 26px; margin-left: -48px;
+      background: rgba(255, 210, 63, .75); transform: rotate(-3deg);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .15);
+    }
+    .polaroid img { border-radius: 3px; aspect-ratio: 3 / 4; object-fit: cover; width: 100%; }
+    .polaroid figcaption { margin-top: 8px; font-family: var(--hand); font-size: 19px; text-align: center; }
+
+    /* ---------- board sections ---------- */
+    .card { margin: 46px 0 0; }
+    .tab {
+      display: inline-block; position: relative; z-index: 1;
+      margin: 0 0 -6px 10px; padding: 10px 20px 14px;
+      background: var(--magenta);
+      border-radius: 6px 6px 0 0;
+      font-family: var(--display); font-weight: 400; font-size: 26px; letter-spacing: .03em; line-height: 1;
+      color: #fff; text-shadow: 0 2px 0 rgba(58, 20, 102, .55);
+      transform: rotate(-1.5deg);
+    }
+    .paper {
+      position: relative;
+      background: var(--paper); color: var(--ink);
+      border-radius: 14px;
+      padding: 20px 18px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+    }
+    .say { margin: 0; font-family: var(--hand); font-size: 23px; line-height: 1.35; }
+    .say + .say { margin-top: 12px; }
+    .note { margin: 14px 0 0; font-size: 15px; line-height: 1.55; color: var(--ink-2); font-weight: 600; }
+    .note b { color: var(--ink); }
+
+    .quote {
+      position: relative; margin: 0; padding-left: 18px;
+      border-left: 5px solid var(--pink);
+    }
+
+    .photos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .photos figure { margin: 0; padding: 7px 7px 8px; background: #fff; border-radius: 6px; box-shadow: 0 6px 16px rgba(35, 28, 51, .18); border: 1px solid var(--line); }
+    .photos figure:nth-child(odd) { transform: rotate(-1.2deg); }
+    .photos figure:nth-child(even) { transform: rotate(1.4deg); }
+    .photos img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 3px; }
+    .photos img.fit { aspect-ratio: 3 / 4; object-fit: contain; background: #24123f; }
+    .photos figcaption { margin-top: 6px; font-family: var(--hand); font-size: 17px; text-align: center; line-height: 1.2; }
+
+    .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-family: var(--hand); font-size: 22px; }
+    .list li { display: flex; gap: 10px; align-items: baseline; }
+    .list li::before { content: '✓'; color: var(--pink); font-family: var(--display); font-size: 18px; }
+    .list small { font-size: 18px; color: var(--ink-2); }
+
+    .steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 12px; }
+    .steps li { counter-increment: s; display: grid; grid-template-columns: 38px 1fr; gap: 10px; align-items: start; font-family: var(--hand); font-size: 21px; line-height: 1.3; }
+    .steps li::before {
+      content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+      border: 2.5px solid var(--ink); font-family: var(--hand); font-size: 20px; line-height: 1;
+    }
+
+    .colors { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: #f4eef9; font-weight: 800; font-size: 14px; color: var(--ink); }
+    .chip i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(35, 28, 51, .2); }
+
+    /* ---------- chart (her results, redrawn) ---------- */
+    .chart { margin: 4px 0 0; }
+    .chart h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 20px; letter-spacing: .01em; }
+    .chart .sub { margin: 2px 0 12px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 12px; padding: 0; list-style: none; font-size: 14px; font-weight: 800; color: var(--ink); }
+    .legend li { display: inline-flex; align-items: center; gap: 7px; }
+    .legend i { width: 14px; height: 14px; border-radius: 4px; }
+    .plot { position: relative; display: grid; grid-template-columns: 26px 1fr; height: 250px; padding-top: 24px; }
+    .yaxis { position: relative; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+    .yaxis span { position: absolute; right: 8px; transform: translateY(50%); }
+    .area { position: relative; border-bottom: 2px solid var(--ink); }
+    .grid { position: absolute; left: 0; right: 0; height: 0; border-top: 1px dashed #e3dbea; }
+    .groups { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); }
+    .group { display: flex; justify-content: center; align-items: flex-end; gap: 2px; padding: 0 6%; }
+    .bar {
+      position: relative; flex: 0 1 30px; min-width: 14px;
+      border-radius: 4px 4px 0 0;
+      outline: none;
+    }
+    .bar .v { position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, -3px); font-size: 13px; font-weight: 900; color: var(--ink); }
+    .bar.zero { background: transparent !important; }
+    .bar .tip {
+      position: absolute; left: 50%; bottom: calc(100% + 22px); transform: translateX(-50%);
+      white-space: nowrap; padding: 6px 9px; border-radius: 8px;
+      background: var(--ink); color: #fff; font-size: 12.5px; font-weight: 700;
+      opacity: 0; pointer-events: none; transition: opacity .12s; z-index: 2;
+    }
+    .bar:hover .tip, .bar:focus .tip { opacity: 1; }
+    .bar::after { content: ''; position: absolute; inset: -6px -3px -2px; } /* bigger hit target */
+    .xaxis { display: grid; grid-template-columns: 26px repeat(3, 1fr); margin-top: 8px; font-size: 13px; font-weight: 800; color: var(--ink); text-align: center; line-height: 1.2; }
+    .xaxis small { display: block; font-weight: 700; color: var(--ink-2); }
+    .xtitle { margin-top: 6px; text-align: center; font-size: 12.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+
+    details.numbers { margin-top: 14px; border-radius: 12px; background: #f6f1fa; padding: 10px 14px; }
+    details.numbers summary { cursor: pointer; font-weight: 900; font-size: 14px; color: var(--ink); }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; font-variant-numeric: tabular-nums; }
+    th, td { padding: 7px 6px; text-align: center; border-bottom: 1px solid var(--line); }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+
+    .shows { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .shows li { display: flex; gap: 10px; align-items: flex-start; font-family: var(--hand); font-size: 21px; line-height: 1.3; }
+    .shows .dot { flex: none; width: 16px; height: 16px; margin-top: 6px; border-radius: 5px; }
+
+    /* ---------- big message ---------- */
+    .message { margin-top: 52px; text-align: center; }
+    .message .pups { display: flex; justify-content: center; gap: 4px; margin-bottom: -8px; }
+    .message .pups span { display: inline-block; width: 74px; height: 89px; background: url('assets/sprites/atlas.webp') no-repeat; }
+    .bubble {
+      position: relative; margin: 0 auto; max-width: 620px; padding: 26px 22px;
+      background: var(--pink); color: #fff; border-radius: 28px;
+      font-family: var(--hand); font-size: clamp(26px, 6.4vw, 36px); line-height: 1.25;
+      box-shadow: 0 0 0 5px #3a1466, 0 18px 40px rgba(255, 46, 147, .35);
+    }
+    .message p.who { margin: 14px 0 0; font-family: var(--hand); font-size: 20px; color: #f4ecff; }
+
+    .cta {
+      display: inline-flex; align-items: center; gap: 10px; margin-top: 30px;
+      padding: 14px 30px 14px 24px; border-radius: 999px;
+      text-decoration: none; color: #fff;
+      font-family: var(--display); font-size: 28px; letter-spacing: .04em;
+      background: linear-gradient(180deg, #ff5aa9, var(--pink) 45%, #c4127a);
+      box-shadow: 0 6px 0 #7a0c4c, 0 14px 30px rgba(255, 46, 147, .45), inset 0 3px 0 rgba(255, 255, 255, .45);
+    }
+    .cta svg { width: 22px; height: 22px; fill: currentColor; }
+    .cta:active { transform: translateY(4px); box-shadow: 0 2px 0 #7a0c4c; }
+    footer { margin-top: 40px; text-align: center; font-size: 13px; font-weight: 700; color: rgba(255, 255, 255, .55); }
+
+    @media (min-width: 720px) {
+      .photos.three { grid-template-columns: repeat(3, 1fr); }
+      .paper { padding: 26px 28px; }
+      .plot { height: 284px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.4 4.6a1.3 1.3 0 0 1 0 1.8L9.8 12l5.6 5.6a1.3 1.3 0 0 1-1.8 1.8l-6.5-6.5a1.3 1.3 0 0 1 0-1.8l6.5-6.5a1.3 1.3 0 0 1 1.8 0z"/></svg>Back to the game</a>
+    <img src="assets/img/logo.webp" alt="Angry Pups" width="900" height="606">
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="kicker">Behind the scenes of my science fair project</div>
+      <h1 class="sign"><span class="l1">How much</span><span class="l2">FORCE?</span><span class="l3">to knock down a toy</span></h1>
+      <p class="byline">Here is how I did my experiment!</p>
+      <figure class="polaroid">
+        <img src="assets/bts/experiment-setup.webp" alt="The launcher with two wooden posts and rubber bands, three foam balls (big, medium and small) and four toy pups sitting on a foam platform" width="825" height="1100">
+        <figcaption>My experiment, all set up!</figcaption>
+      </figure>
+    </section>
+
+    <section class="card" aria-labelledby="why">
+      <h2 class="tab" id="why">Why I picked force</h2>
+      <div class="paper">
+        <p class="say quote">I picked force because I like it. In the Angry Birds game, you have to launch the birds and try to break the box.</p>
+        <p class="note">Force is a <b>push</b> or a <b>pull</b>. A launcher gives a ball a big push so it can fly and knock things over.</p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="question">
+      <h2 class="tab" id="question">My big question</h2>
+      <div class="paper">
+        <p class="say">I wanted to find out how much force is needed to knock down a toy.</p>
+        <div class="photos">
+          <figure>
+            <img src="assets/bts/title-sign.webp" alt="The cut-out sign for the board that says How much force to knock down a toy" loading="lazy" width="825" height="1100">
+            <figcaption>The sign for my board</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bts/toy-pups.webp" alt="Two brown toy puppies and a cream toy puppy in a hand" loading="lazy" width="825" height="1100">
+            <figcaption>The toy pups I tried to knock down</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="used">
+      <h2 class="tab" id="used">What I used</h2>
+      <div class="paper">
+        <ul class="list">
+          <li>Rubber bands</li>
+          <li>Cloth <small>(for the pouch)</small></li>
+          <li>A foam platform</li>
+          <li>2 wooden dowels</li>
+          <li>Hot glue and cardstock</li>
+          <li>3 foam balls <small>(small, medium and big)</small></li>
+          <li>4 foam obstacles</li>
+          <li>4 small toy pups</li>
+        </ul>
+        <div class="photos">
+          <figure>
+            <img src="assets/bts/foam-obstacles.webp" alt="White foam blocks and round foam discs on a gray board" loading="lazy" width="825" height="1100">
+            <figcaption>Foam obstacles</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bts/marshmallow-pup.webp" alt="A cream-colored fluffy toy puppy held between two fingers" loading="lazy" width="825" height="1100">
+            <figcaption>The fluffy pup</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="built">
+      <h2 class="tab" id="built">Building the launcher</h2>
+      <div class="paper">
+        <p class="say quote">My dad helped me by building the launching thing to launch and hit the puppies.</p>
+        <p class="note">It is a box with two wooden posts, rubber bands and a cloth pouch. You put a ball in the pouch, pull it back and let go. <b>The colors on top show how far you pull back.</b></p>
+        <div class="colors">
+          <span class="chip"><i style="background:#ff2e93"></i>Pink = medium pull</span>
+          <span class="chip"><i style="background:#6a2bb8"></i>Purple = large pull</span>
+        </div>
+        <div class="photos">
+          <figure>
+            <img src="assets/bts/launcher.webp" alt="The launcher box with a purple stripe, a pink stripe, a black cloth pouch and two wooden posts" loading="lazy" width="825" height="1100">
+            <figcaption>The launcher</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bts/loading-the-launcher.webp" alt="A foam ball sitting in the black pouch, ready to launch at the pups on the foam platform" loading="lazy" width="825" height="1100">
+            <figcaption>Loaded and ready!</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="did">
+      <h2 class="tab" id="did">What I did</h2>
+      <div class="paper">
+        <ol class="steps">
+          <li>Set up the foam obstacles and the toy pups so the pups are grouped in the center.</li>
+          <li>Choose a ball.</li>
+          <li>Put the ball in the launcher, pull it back to a marked distance and aim for the pups.</li>
+          <li>Count how many pups fell over.</li>
+          <li>Do it again with another ball size. Keep the obstacles the same!</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="happened">
+      <h2 class="tab" id="happened">What happened</h2>
+      <div class="paper">
+        <figure class="chart" aria-labelledby="chart-title">
+          <h3 id="chart-title">Pups knocked down</h3>
+          <p class="sub">Out of 4 pups, for each ball and each pull</p>
+          <ul class="legend" aria-label="Ball size">
+            <li><i style="background:var(--s-small)"></i>Small ball</li>
+            <li><i style="background:var(--s-medium)"></i>Medium ball</li>
+            <li><i style="background:var(--s-large)"></i>Large ball</li>
+          </ul>
+          <div class="plot" id="plot" role="img" aria-label="Bar chart. Low pull: small ball 0, medium ball 1, large ball 1. Medium pull: small 1, medium 3, large 4. Large pull: small 1, medium 4, large 4."></div>
+          <div class="xaxis" aria-hidden="true"><span></span><span>Low</span><span>Medium<small>(pink)</small></span><span>Large<small>(purple)</small></span></div>
+          <div class="xtitle">How far I pulled back</div>
+        </figure>
+        <details class="numbers">
+          <summary>See the numbers</summary>
+          <table>
+            <thead><tr><th>Ball size</th><th>Low pull</th><th>Medium pull</th><th>Large pull</th></tr></thead>
+            <tbody>
+              <tr><td>Small</td><td>0</td><td>1</td><td>1</td></tr>
+              <tr><td>Medium</td><td>1</td><td>3</td><td>4</td></tr>
+              <tr><td>Large</td><td>1</td><td>4</td><td>4</td></tr>
+            </tbody>
+          </table>
+        </details>
+        <div class="photos">
+          <figure>
+            <img src="assets/bts/science-board.webp" alt="The science fair board with the purpose, materials, procedure and a hand-drawn results chart and table" loading="lazy" width="825" height="1100">
+            <figcaption>My real science fair board</figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bts/foam-balls.webp" alt="A big, a medium and a small white foam ball on the floor" loading="lazy">
+            <figcaption>Small, medium and big balls</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="learned">
+      <h2 class="tab" id="learned">What I learned</h2>
+      <div class="paper">
+        <p class="say quote">I learned about how much force you need to launch a little ball, a big ball and a medium-sized ball to knock down the puppies and dodge the obstacles.</p>
+        <p class="note">My chart shows:</p>
+        <ul class="shows">
+          <li><span class="dot" style="background:var(--s-small)"></span>The little ball only knocked down 1 pup, even with a big pull.</li>
+          <li><span class="dot" style="background:var(--s-medium)"></span>The medium ball knocked down all 4 pups with a large pull.</li>
+          <li><span class="dot" style="background:var(--s-large)"></span>The big ball knocked down all 4 pups with just a medium pull.</li>
+        </ul>
+        <p class="note"><b>More pull and a bigger ball = more force = more pups down!</b></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="game">
+      <h2 class="tab" id="game">Then we made a game!</h2>
+      <div class="paper">
+        <p class="say quote">And he also made a whole game about it.</p>
+        <p class="note">In <b>Angry Pups</b>, you pull back a launcher just like my real one. The Pull meter even uses <b>low, medium and large</b>, just like my experiment. The pups and foam balls in the game look like my real toys!</p>
+        <div class="photos">
+          <figure>
+            <img src="assets/bts/game-on-ipad.webp" alt="The Angry Pups title screen on a tablet" loading="lazy" width="825" height="1100">
+            <figcaption>Angry Pups on our tablet</figcaption>
+          </figure>
+          <figure>
+            <img class="fit" src="assets/bts/game-characters.webp" alt="The game's pup characters, foam ball characters and launcher" loading="lazy">
+            <figcaption>My toys turned into game characters</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="message" aria-labelledby="tell">
+      <div class="pups" aria-hidden="true"><span id="pup-a"></span><span id="pup-b"></span></div>
+      <h2 class="tab" id="tell" style="margin-left:0">What I want to tell people</h2>
+      <p class="bubble">It's fun to play with force, and force is fun. Force is, like, everywhere!</p>
+      <p class="who">Thanks for checking out my project!</p>
+      <a class="cta" href="index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2v13.6c0 .8.9 1.3 1.6.8l10-6.8a1 1 0 0 0 0-1.6l-10-6.8C8.9 3.9 8 4.4 8 5.2z"/></svg>Play Angry Pups</a>
+    </section>
+
+    <footer>Angry Pups · a science fair project about force</footer>
+  </main>
+
+  <script src="js/atlas-data.js"></script>
+  <script>
+    (function () {
+      // Her results, read from the board: pups knocked down out of 4.
+      var pulls = ['Low', 'Medium', 'Large'];
+      var balls = [
+        { name: 'Small ball', color: 'var(--s-small)', values: [0, 1, 1] },
+        { name: 'Medium ball', color: 'var(--s-medium)', values: [1, 3, 4] },
+        { name: 'Large ball', color: 'var(--s-large)', values: [1, 4, 4] },
+      ];
+      var MAX = 4;
+      var plot = document.getElementById('plot');
+      var y = document.createElement('div');
+      y.className = 'yaxis';
+      y.setAttribute('aria-hidden', 'true');
+      var area = document.createElement('div');
+      area.className = 'area';
+      for (var t = 0; t <= MAX; t++) {
+        var lab = document.createElement('span');
+        lab.style.bottom = (t / MAX * 100) + '%';
+        lab.textContent = t;
+        y.appendChild(lab);
+        if (t > 0) {
+          var g = document.createElement('div');
+          g.className = 'grid';
+          g.style.bottom = (t / MAX * 100) + '%';
+          area.appendChild(g);
+        }
+      }
+      var groups = document.createElement('div');
+      groups.className = 'groups';
+      pulls.forEach(function (pull, i) {
+        var grp = document.createElement('div');
+        grp.className = 'group';
+        balls.forEach(function (b) {
+          var v = b.values[i];
+          var bar = document.createElement('div');
+          bar.className = 'bar' + (v === 0 ? ' zero' : '');
+          bar.tabIndex = 0;
+          bar.style.height = Math.max(v / MAX * 100, 0) + '%';
+          bar.style.background = b.color;
+          bar.setAttribute('aria-label', b.name + ', ' + pull.toLowerCase() + ' pull: ' + v + ' of 4 pups');
+          bar.innerHTML = '<span class="v">' + v + '</span><span class="tip">' + b.name + ' · ' + pull + ' pull: ' + v + ' of 4</span>';
+          grp.appendChild(bar);
+        });
+        groups.appendChild(grp);
+      });
+      area.appendChild(groups);
+      plot.appendChild(y);
+      plot.appendChild(area);
+
+      // Two pup sprites from the game's atlas for the final message.
+      var A = window.AP && window.AP.ATLAS;
+      if (A) {
+        [['pup-a', 'biscuit_angry'], ['pup-b', 'marsh_angry']].forEach(function (p) {
+          var el = document.getElementById(p[0]), f = A.frames[p[1]], h = 89, sc = h / f.h;
+          el.style.width = Math.round(f.w * sc) + 'px';
+          el.style.backgroundSize = (A.w * sc) + 'px ' + (A.h * sc) + 'px';
+          el.style.backgroundPosition = (-f.x * sc) + 'px ' + (-f.y * sc) + 'px';
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

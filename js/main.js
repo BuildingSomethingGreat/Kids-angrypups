@@ -124,7 +124,8 @@
       btn.type = 'button';
       btn.className = 'level-card' + (locked ? ' locked' : '');
       btn.style.animationDelay = (i * 0.06) + 's';
-      var pupKey = ['biscuit_angry', 'marsh_angry', 'marsh_helmet', 'biscuit_angry', 'biscuit_helmet'][i];
+      var pupKey = ['biscuit_angry', 'marsh_angry', 'marsh_helmet', 'biscuit_angry', 'biscuit_helmet',
+        'marsh_angry', 'biscuit_angry', 'marsh_helmet', 'biscuit_helmet', 'marsh_helmet'][i] || 'biscuit_angry';
       btn.innerHTML =
         '<div class="thumb"><span class="num">' + lv.id + '</span>' + spriteHTML(pupKey, 86) +
         (locked ? '<span class="lock"><svg><use href="#i-lock"/></svg></span>' : '') + '</div>' +
@@ -225,6 +226,8 @@
     var hit = info.impulse || 0;
     $('lab-ball').textContent = B.name + ' · ' + B.weight;
     setMeter('pull', pull, G.word(pull, W.pull));
+    // Same zones as the real launcher: white = low, pink = medium, purple = large.
+    $('lab-pull-bar').style.background = pull < 0.34 ? '#f3ecfa' : pull < 0.67 ? '#ff2e93' : '#8a3fe0';
     setMeter('push', pull, G.word(pull, W.push));
     setMeter('speed', v / 30, G.word(v, W.speed));
     setMeter('hit', hit / 14, G.word(hit, W.hit));
@@ -349,6 +352,11 @@
     3: 'Keep hitting the same taped wall. The hits add up!',
     4: 'Aim high on the tower so it tips over!',
     5: 'Bonk the little pup in front first. Then hit the helmet pups with heavy Chonk.',
+    6: 'Hit the tall tower up high so it tips over. Up high = big fall!',
+    7: 'Break the front wall first, then the next one. The hiding pups are behind!',
+    8: 'Knock out one of the towers holding up the bridge!',
+    9: 'Use heavy Chonk to push through the thick pyramid.',
+    10: 'Bonk the front pup first, tip the tall tower, then pound the taped fort with Chonk.',
   };
 
   function showLose() {
@@ -415,11 +423,11 @@
     close: function () { closeModal(); },
     finale: function () {
       openModal(
-        '<div class="m-ribbon" style="text-align:center"><div class="m-kicker">All 5 levels done!</div><h3 class="m-title">Force Champion!</h3></div>' +
+        '<div class="m-ribbon" style="text-align:center"><div class="m-kicker">All ' + LEVELS.length + ' levels done!</div><h3 class="m-title">Force Champion!</h3></div>' +
         '<div class="m-body" style="text-align:center">' +
         '<div class="lose-pup">' + spriteHTML('biscuit_ko', 110) + spriteHTML('marsh_ko', 110) + '</div>' +
         '<p class="learned" style="text-align:left"><b>You proved it</b>More pull makes more push. Light balls fly fast. Heavy balls hit hard. Tough things need lots of hits. That is real science!</p>' +
-        '<div class="m-actions"><button class="btn alt" data-act="levels" type="button"><svg><use href="#i-home"/></svg>Levels</button><button class="btn" data-act="title" data-focus type="button">Title</button></div>' +
+        '<div class="m-actions"><button class="btn alt" data-act="levels" type="button"><svg><use href="#i-home"/></svg>Levels</button><a class="btn" href="behind-the-scenes.html" data-focus>Behind the scenes</a></div>' +
         '</div>'
       );
     },
@@ -518,7 +526,7 @@
     $('loading').classList.add('done');
     requestAnimationFrame(uiTick);
     // Deep link for testing / sharing a level: index.html#level=3
-    var m = /level=(\d)/.exec(location.hash);
+    var m = /level=(\d+)/.exec(location.hash);
     if (m && LEVELS[m[1] - 1]) { Audio.unlock(); startLevel(Number(m[1]) - 1); }
   }).catch(function (err) {
     $('loading').querySelector('p').textContent = 'Could not load the game: ' + err.message;

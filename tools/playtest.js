@@ -34,7 +34,8 @@ fs.mkdirSync(OUT, { recursive: true });
     await page.click('[data-act="go"]', { force: true });
 
     for (const [i, shot] of solutions[id].entries()) {
-      await page.waitForFunction(() => window.AP.Game.sim.state === 'ready', null, { timeout: 30000 });
+      await page.waitForFunction(() => ['ready', 'won', 'lost'].includes(window.AP.Game.sim.state), null, { timeout: 30000 });
+      if (await page.evaluate(() => window.AP.Game.sim.state !== 'ready')) break; // finished early
       await page.waitForTimeout(1600); // let the camera return
       await page.evaluate((t) => window.AP.Game.selectBall(t), shot.type);
       const geo = await page.evaluate(() => {

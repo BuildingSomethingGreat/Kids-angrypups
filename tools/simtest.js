@@ -99,13 +99,15 @@ function greedy(level, seed) {
 const args = process.argv.slice(2);
 const json = args.includes('--json');
 const only = args.find((a) => /^\d+$/.test(a)) ? Number(args.find((a) => /^\d+$/.test(a))) : null;
+const seedArg = args.find((a) => a.startsWith('--seed='));
+const seedOffset = seedArg ? Number(seedArg.slice(7)) : 0;
 const solutions = {};
 let failed = false;
 for (const level of LEVELS) {
   if (only && level.id !== only) continue;
   const st = stability(level);
   const t0 = Date.now();
-  const g = greedy(level, 1234 + level.id);
+  const g = greedy(level, 1234 + level.id + seedOffset);
   const ms = Date.now() - t0;
   console.log(
     `L${level.id} ${level.name.padEnd(14)} stable=${st.ok} (drift ${st.drift.toFixed(3)}m, events ${st.events})  ` +

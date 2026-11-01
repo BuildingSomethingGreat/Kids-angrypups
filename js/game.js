@@ -34,7 +34,8 @@
 
   // ---------- kid-friendly "more or less" words for the physics numbers
   G.WORDS = {
-    pull: [[0.05, 'none'], [0.3, 'a little'], [0.6, 'some'], [0.9, 'a lot'], [Infinity, 'all the way!']],
+    // Matches the real experiment's pull-back distances: low, medium, large.
+    pull: [[0.05, 'none'], [0.34, 'low'], [0.67, 'medium'], [Infinity, 'large']],
     push: [[0.05, 'none'], [0.3, 'small'], [0.6, 'medium'], [0.9, 'big'], [Infinity, 'HUGE!']],
     speed: [[0.5, '–'], [9, 'slow'], [16, 'medium'], [23, 'fast'], [Infinity, 'super fast!']],
     hit: [[1, '–'], [3, 'tap'], [6, 'bonk'], [10, 'BAM!'], [Infinity, 'KABOOM!']],
