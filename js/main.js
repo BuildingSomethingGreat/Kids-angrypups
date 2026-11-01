@@ -166,7 +166,7 @@
       openModal(
         '<div class="m-ribbon"><div class="m-kicker">Level ' + lv.id + ' · ' + lv.concept + '</div><h3 class="m-title">' + lv.name + '</h3></div>' +
         '<div class="m-body">' +
-        '<div class="formulas">' + [].concat(lv.formula).map(function (f) { return '<span class="formula">' + f + '</span>'; }).join('') + '</div>' +
+        '<div class="rules">' + lv.rules.map(function (r) { return '<span class="rule">' + r + '</span>'; }).join('') + '</div>' +
         '<p class="m-goal">' + lv.goal + '</p>' +
         '<p class="m-tip">' + lv.tip + '</p>' +
         '<div class="m-balls">Your foam balls: ' + ballLine(lv) + '</div>' +
@@ -188,8 +188,8 @@
       b.className = 'ball-btn';
       b.dataset.ball = k;
       b.appendChild(sprite(B.sprite, k === 's' ? 30 : k === 'm' ? 38 : 46));
-      b.insertAdjacentHTML('beforeend', '<span class="lbl">' + B.name + ' · ' + B.m + ' kg</span><span class="cnt">0</span>');
-      b.setAttribute('aria-label', B.label + ' foam ball ' + B.name + ', mass ' + B.m + ' kilograms');
+      b.insertAdjacentHTML('beforeend', '<span class="lbl">' + B.name + ' · ' + B.weight + '</span><span class="cnt">0</span>');
+      b.setAttribute('aria-label', B.name + ', the ' + B.weight + ' foam ball');
       b.addEventListener('click', function () { G.selectBall(k); updateTray(); });
       tray.appendChild(b);
     });
@@ -210,21 +210,24 @@
     });
   }
 
+  // The Force Lab shows "more or less" meters with words instead of numbers.
   var labTimer = 0;
+  function setMeter(id, frac, text) {
+    $('lab-' + id + '-bar').style.width = Math.round(Math.max(0, Math.min(1, frac)) * 100) + '%';
+    $('lab-' + id).textContent = text;
+  }
   function updateLab() {
     var info = G.labInfo();
     if (!info) return;
-    var B = BALLS[info.type];
+    var B = BALLS[info.type], W = G.WORDS;
+    var pull = info.x / PHYS.maxPull;
     var v = info.vMeasured !== undefined ? info.vMeasured : info.v;
-    var p = info.pMeasured !== undefined ? info.pMeasured : info.p;
-    var approx = info.vMeasured === undefined && info.x > 0;
-    $('lab-ball').textContent = B.name + ' · m = ' + B.m.toFixed(1) + ' kg';
-    $('lab-x').textContent = 'x = ' + info.x.toFixed(2) + ' m';
-    $('lab-f').textContent = 'F = k·x = ' + Math.round(info.F) + ' N';
-    $('lab-a').textContent = 'a = F/m = ' + Math.round(info.a) + ' m/s²';
-    $('lab-v').textContent = 'v ' + (approx ? '≈ ' : '= ') + v.toFixed(1) + ' m/s';
-    $('lab-p').textContent = 'p = ' + p.toFixed(1) + ' kg·m/s';
-    $('lab-j').textContent = info.impulse ? 'J = ' + info.impulse.toFixed(1) + ' N·s' : 'J = –';
+    var hit = info.impulse || 0;
+    $('lab-ball').textContent = B.name + ' · ' + B.weight;
+    setMeter('pull', pull, G.word(pull, W.pull));
+    setMeter('push', pull, G.word(pull, W.push));
+    setMeter('speed', v / 30, G.word(v, W.speed));
+    setMeter('hit', hit / 14, G.word(hit, W.hit));
   }
 
   function updateHUD(force) {
@@ -266,7 +269,7 @@
   G.on('ammo', updateTray);
   G.on('pupKO', function () { if (G.sim.pupsAlive() > 0) toast(cheers[Math.floor(Math.random() * cheers.length)], 1300); });
   G.on('launch', function (e) {
-    var row = document.querySelector('#lab-v').parentNode;
+    var row = $('lab-speed').closest('.lab-row');
     row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash');
     void e;
   });
@@ -276,9 +279,9 @@
     if (G.sim.score === missTip && G.lastShot) {
       var lv = LEVELS[levelIndex];
       var pull = G.lastShot.x / PHYS.maxPull;
-      if (pull < 0.55) toast('Pull back farther for more force!', 2400);
-      else if (lv.id === 2) toast('Try a different mass: Zip is fast, Chonk is strong', 2600);
-      else toast('Watch the dots and adjust your angle', 2200);
+      if (pull < 0.55) toast('Pull back more for a bigger push!', 2400);
+      else if (lv.id === 2) toast('Try the other ball! Zip is fast, Chonk is strong', 2600);
+      else toast('Watch the dots, then try a new angle', 2200);
     }
   });
   G.on('won', function () { setTimeout(showWin, 1100); });
@@ -302,17 +305,17 @@
     openModal(
       '<div class="win-layout"><div class="m-ribbon win-ribbon">' +
       '<div class="win-stars">' + starSVG(stars >= 1) + starSVG(stars >= 2) + starSVG(stars >= 3) + '</div>' +
-      '<div class="win-score"><span id="win-score">0</span><small>' + (last ? 'FORTRESS CLEARED!' : 'LEVEL ' + lv.id + ' CLEARED') + (sim.ammoLeft() ? ' · +' + fmt(sim.ammoLeft() * AP.SCORE.ballLeft) + ' ball bonus' : '') + '</small></div>' +
+      '<div class="win-score"><span id="win-score">0</span><small>' + (last ? 'FORTRESS CLEARED!' : 'LEVEL ' + lv.id + ' DONE!') + (sim.ammoLeft() ? ' · +' + fmt(sim.ammoLeft() * AP.SCORE.ballLeft) + ' for extra balls' : '') + '</small></div>' +
       '</div>' +
       '<div class="m-body">' +
       '<div class="m-kicker report-kicker">Lab report</div>' +
       '<div class="report">' +
-      cell('Shots fired', st.shots, sim.ammoLeft() + ' ball' + (sim.ammoLeft() === 1 ? '' : 's') + ' left') +
-      cell('Strongest pull', Math.round(st.maxForce) + ' N', 'F = k·x') +
-      cell('Fastest launch', st.maxSpeed.toFixed(1) + ' m/s', 'launch speed v') +
-      cell('Most momentum', st.maxMomentum.toFixed(1), 'kg·m/s · p = m·v') +
-      cell('Hardest hit', bestImpact.toFixed(1) + ' N·s', 'impulse J') +
-      cell('Knocked out', st.pupsKO + ' pup' + (st.pupsKO === 1 ? '' : 's'), st.blocksBroken + ' foam broken') +
+      cell('Shots', st.shots, sim.ammoLeft() + ' ball' + (sim.ammoLeft() === 1 ? '' : 's') + ' left over') +
+      cell('Biggest pull', G.word(st.maxForce / (PHYS.k * PHYS.maxPull), G.WORDS.pull), 'more pull = more push') +
+      cell('Fastest ball', G.word(st.maxSpeed, G.WORDS.speed), 'light balls fly faster') +
+      cell('Hardest hit', G.word(bestImpact, G.WORDS.hit), 'heavy balls hit harder') +
+      cell('Pups bonked', st.pupsKO, 'all of them!') +
+      cell('Foam broken', st.blocksBroken, st.blocksBroken ? 'crunch!' : 'not this time') +
       '</div>' +
       '<p class="learned"><b>What we learned</b>' + lv.learned + '</p>' +
       '<div class="m-actions">' +
@@ -341,11 +344,11 @@
   }
 
   var loseHints = {
-    1: 'Stretch the band farther. More stretch means more force (F = k·x).',
-    2: 'Use light Zip to lob over the wall, and heavy Chonk to shove the tower.',
-    3: 'Keep hitting the same taped wall. The impulses add up!',
-    4: 'Aim high on the tower so it tips over. Torque!',
-    5: 'Take out the outpost pup first, then pound the helmet bosses with Chonk.',
+    1: 'Pull the band back more for a bigger push!',
+    2: 'Send light Zip high over the wall. Use heavy Chonk to shove the tower.',
+    3: 'Keep hitting the same taped wall. The hits add up!',
+    4: 'Aim high on the tower so it tips over!',
+    5: 'Bonk the little pup in front first. Then hit the helmet pups with heavy Chonk.',
   };
 
   function showLose() {
@@ -357,7 +360,7 @@
       '<div class="m-ribbon"><div class="m-kicker">Level ' + lv.id + ' · out of foam balls</div><h3 class="m-title">The pups held the fort!</h3></div>' +
       '<div class="m-body">' +
       '<div class="lose-pup">' + spriteHTML('biscuit_angry', 110) + spriteHTML('marsh_angry', 110) + '</div>' +
-      '<p class="learned"><b>Lab tip</b>' + loseHints[lv.id] + '</p>' +
+      '<p class="learned"><b>Try this</b>' + loseHints[lv.id] + '</p>' +
       '<div class="m-actions">' +
       '<button class="btn ghost small" data-act="levels" type="button" aria-label="Levels"><svg><use href="#i-home"/></svg></button>' +
       '<button class="btn" data-act="replay" data-focus type="button"><svg><use href="#i-restart"/></svg>Try again</button>' +
@@ -384,20 +387,22 @@
   }
 
   function scienceHTML(fromPause) {
-    return '<div class="m-ribbon"><div class="m-kicker">How the game uses real physics</div><h3 class="m-title">The Science of Angry Pups</h3></div>' +
+    return '<div class="m-ribbon"><div class="m-kicker">How Angry Pups works</div><h3 class="m-title">The Science, Made Simple</h3></div>' +
       '<div class="m-body"><div class="science-grid">' +
-      sci(1, 'Spring force', 'F = k × x', 'Our pink and purple slingshot\'s rubber bands act like a spring. The farther you pull (x), the bigger the force (F). In the game, k = 100 N/m, so a 2 m stretch pushes with 200 N.') +
-      sci(2, 'Newton\'s 2nd law', 'a = F ÷ m', 'The same push speeds up a light ball more than a heavy one. Zip (0.5 kg) gets twice the acceleration of Bop (1 kg).') +
-      sci(3, 'Energy becomes speed', '½kx² = ½mv²', 'The stretched band stores energy. When you let go, it turns into motion. Every ball gets the same energy from the same pull, but light balls go faster.') +
-      sci(4, 'Momentum & impulse', 'p = m × v   J = F × Δt', 'A heavy ball keeps more "oomph" (momentum). When it hits, it delivers an impulse. Bigger impulses do more damage, and tough foam needs several.') +
-      sci(5, 'Gravity', 'g = 9.8 m/s²', 'Gravity pulls every ball down at the same rate, so they fly in a curved path called a parabola. The dotted line shows where it starts to go.') +
+      sci(1, 'More pull, more push', 'Our pink and purple slingshot has stretchy rubber bands. Pull them back a little and they push a little. Pull them back a lot and they push a LOT!') +
+      sci(2, 'Light balls go fast', 'The same push makes a light ball zoom faster than a heavy ball. Zip is the lightest, so Zip is the fastest!') +
+      sci(3, 'Heavy balls hit hard', 'Heavy balls fly slower, but they hit harder. Chonk is the heaviest, so Chonk can shove big things.') +
+      sci(4, 'Tough things need more hits', 'Taped foam and bottle-cap helmets are tough. Every hit adds up until they break.') +
+      sci(5, 'Gravity pulls down', 'Gravity always pulls things down. That is why the ball flies in a curve, like a rainbow. The dots show where it is going.') +
       '</div>' +
-      '<div class="try"><b>Try it with the real slingshot</b>Pull the pouch back 5, 10 and 15 cm and measure how far the foam ball flies each time. Then try a bigger ball with the same pull. Does it match the game?</div>' +
+      '<div class="try"><b>Try it with the real slingshot</b>Pull the ball back a little, then a lot. Which one flies farther? Now try a big ball and a small ball with the same pull. Which one goes farther?</div>' +
+      '<details class="grownups"><summary>For grown-ups: the real math</summary>' +
+      '<p>The game runs a real physics engine. The band is a spring: <b>F = k·x</b> (k = 100 N/m). Lighter balls get more speed from the same pull (<b>½kx² = ½mv²</b>), heavier balls carry more momentum (<b>p = m·v</b>), and damage is the impulse of each hit (<b>J = F·Δt</b>). Gravity is 9.8 m/s².</p></details>' +
       '<div class="m-actions"><button class="btn" data-act="' + (fromPause ? 'resume' : 'close') + '" data-focus type="button">Got it!</button></div>' +
       '</div>';
   }
-  function sci(n, title, f, text) {
-    return '<div class="sci"><span class="n">' + n + '</span><h4>' + title + '<em>' + f + '</em></h4><p>' + text + '</p></div>';
+  function sci(n, title, text) {
+    return '<div class="sci"><span class="n">' + n + '</span><h4>' + title + '</h4><p>' + text + '</p></div>';
   }
 
   var actions = {
@@ -410,10 +415,10 @@
     close: function () { closeModal(); },
     finale: function () {
       openModal(
-        '<div class="m-ribbon" style="text-align:center"><div class="m-kicker">All 5 experiments complete</div><h3 class="m-title">Force &amp; Motion Champion!</h3></div>' +
+        '<div class="m-ribbon" style="text-align:center"><div class="m-kicker">All 5 levels done!</div><h3 class="m-title">Force Champion!</h3></div>' +
         '<div class="m-body" style="text-align:center">' +
         '<div class="lose-pup">' + spriteHTML('biscuit_ko', 110) + spriteHTML('marsh_ko', 110) + '</div>' +
-        '<p class="learned" style="text-align:left"><b>You proved it</b>More stretch means more force. Lighter balls fly faster, heavier balls carry more momentum, and big impulses break tough things. That is real physics!</p>' +
+        '<p class="learned" style="text-align:left"><b>You proved it</b>More pull makes more push. Light balls fly fast. Heavy balls hit hard. Tough things need lots of hits. That is real science!</p>' +
         '<div class="m-actions"><button class="btn alt" data-act="levels" type="button"><svg><use href="#i-home"/></svg>Levels</button><button class="btn" data-act="title" data-focus type="button">Title</button></div>' +
         '</div>'
       );
@@ -432,6 +437,36 @@
   }
 
   // ---------- wiring
+  function enterGame() {
+    var fresh = save.unlocked === 1 && !save.best[1];
+    if (fresh) startLevel(0);
+    else { renderLevels(); show('levels'); }
+  }
+
+  // ---------- "turn your phone sideways" (shown once per visit, before playing)
+  var gateSeen = false, gateNext = null;
+  function isUprightPhone() {
+    return matchMedia('(pointer: coarse)').matches && root.innerHeight > root.innerWidth;
+  }
+  function openGate(next) {
+    gateSeen = true;
+    gateNext = next;
+    $('rotate-gate').classList.add('show');
+    $('rotate-gate').setAttribute('aria-hidden', 'false');
+  }
+  function closeGate() {
+    if (!gateNext) return;
+    var next = gateNext;
+    gateNext = null;
+    $('rotate-gate').classList.remove('show');
+    $('rotate-gate').setAttribute('aria-hidden', 'true');
+    next();
+  }
+  root.addEventListener('resize', function () {
+    if (gateNext && root.innerWidth > root.innerHeight) { Audio.play('select'); setTimeout(closeGate, 350); }
+  });
+  $('rg-skip').addEventListener('click', function () { Audio.play('click'); closeGate(); });
+
   $('btn-play').addEventListener('click', function () {
     Audio.unlock();
     Audio.startMusic();
@@ -439,9 +474,8 @@
     if (matchMedia('(pointer: coarse)').matches && document.documentElement.requestFullscreen && !document.fullscreenElement) {
       document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(function () {});
     }
-    var fresh = save.unlocked === 1 && !save.best[1];
-    if (fresh) startLevel(0);
-    else { renderLevels(); show('levels'); }
+    if (!gateSeen && isUprightPhone()) openGate(enterGame);
+    else enterGame();
   });
   $('btn-science').addEventListener('click', function () { Audio.unlock(); Audio.startMusic(); Audio.play('click'); openModal(scienceHTML(false), { wide: true }); });
   $('btn-levels-back').addEventListener('click', function () { Audio.play('click'); show('title'); });
@@ -470,7 +504,6 @@
 
   var shortScreen = Math.min(root.innerWidth, root.innerHeight) < 430;
   if (save.labCollapsed === true || (save.labCollapsed === undefined && shortScreen && root.innerHeight < root.innerWidth)) $('lab').classList.add('collapsed');
-  $('lab-v').parentNode.classList.add('keep');
 
   syncSound();
   G.init($('game'));

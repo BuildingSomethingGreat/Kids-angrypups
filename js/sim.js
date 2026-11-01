@@ -40,9 +40,9 @@
   var SLING_REST = { x: 4.61, y: 1.8 };
 
   var BALLS = {
-    s: { key: 's', name: 'Zip', label: 'Small', r: 0.3, m: 0.5, restitution: 0.38, sprite: 'ball_s' },
-    m: { key: 'm', name: 'Bop', label: 'Medium', r: 0.45, m: 1.0, restitution: 0.33, sprite: 'ball_m' },
-    l: { key: 'l', name: 'Chonk', label: 'Large', r: 0.62, m: 2.0, restitution: 0.28, sprite: 'ball_l' },
+    s: { key: 's', name: 'Zip', label: 'Small', weight: 'light', r: 0.3, m: 0.5, restitution: 0.38, sprite: 'ball_s' },
+    m: { key: 'm', name: 'Bop', label: 'Medium', weight: 'medium', r: 0.45, m: 1.0, restitution: 0.33, sprite: 'ball_m' },
+    l: { key: 'l', name: 'Chonk', label: 'Large', weight: 'heavy', r: 0.62, m: 2.0, restitution: 0.28, sprite: 'ball_l' },
   };
 
   var MATS = {

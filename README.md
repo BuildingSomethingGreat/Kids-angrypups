@@ -25,38 +25,44 @@ The game is plain HTML/CSS/JavaScript with no build step.
 - On a phone you can **Add to Home Screen** and it opens full-screen like an app.
 
 **How to play:** drag back on the foam ball in the slingshot and let go. Pick a ball
-from the tray: **Zip** (small, 0.5 kg), **Bop** (medium, 1 kg) or **Chonk** (large, 2 kg).
-Knock out every pup before you run out of balls. Taped foam and pups wearing bottle-cap
-helmets need several hits.
+from the tray: **Zip** (light), **Bop** (medium) or **Chonk** (heavy). Knock out every
+pup before you run out of balls. Taped foam and pups wearing bottle-cap helmets need
+several hits. On a phone, turn it sideways for the best view (the game reminds you).
 
-## The science (it's real physics)
+## The science, for kids
 
-The game runs a real physics engine ([planck.js](https://github.com/piqnt/planck.js), a
-port of Box2D) in SI units: metres, kilograms, seconds and newtons, with gravity
-g = 9.8 m/s².
+Everything on screen is written for a 3rd grader: no formulas, just "more or less" and
+"light or heavy". The **Force Lab** panel shows Pull, Push, Speed and Hit as meters with
+words like *a little*, *a lot*, *fast* and *KABOOM!*
+
+Each of the 5 levels teaches one big idea:
+
+1. **Stretch It!** More pull = more push
+2. **Light or Heavy?** Light = fast, heavy = strong
+3. **Tough Stuff** Tough things need more hits
+4. **Topple Tower** Push up high = easy to tip (then gravity pulls it down)
+5. **Pup Fortress** Use it all!
+
+After each level, the **Lab Report** shows the biggest pull, fastest ball and hardest
+hit, plus a "What we learned" sentence.
+
+*Try it with the real slingshot:* pull the ball back a little, then a lot. Which one
+flies farther? Then try a big ball and a small ball with the same pull.
+
+## The science, for grown-ups
+
+Under the hood the game runs a real physics engine
+([planck.js](https://github.com/piqnt/planck.js), a port of Box2D) in SI units with
+gravity g = 9.8 m/s². The kid-friendly words are just labels on these numbers. The same
+math is in a collapsed "For grown-ups" note on the in-game science screen.
 
 | Idea | Formula | How the game uses it |
 |---|---|---|
-| Spring force (Hooke's law) | `F = k × x` | The slingshot band is a spring with k = 100 N/m. The band pushes the ball **every physics step** with F = k·x until it passes the rest point. More stretch means more force. |
-| Newton's 2nd law | `a = F ÷ m` | The same band force accelerates light Zip twice as much as Bop. |
-| Energy → speed | `½kx² = ½mv²` | Every ball gets the same energy from the same pull, so v = x·√(k/m): light balls fly faster. The Force Lab panel shows the predicted speed, then the speed the simulation actually measured. |
-| Momentum | `p = m × v` | Heavy Chonk is slower but carries more momentum, so it shoves heavy things around. |
-| Impulse | `J = F × Δt` | Damage is the collision impulse read straight from the physics solver (shown as "N·s" on every hit). Foam soaks up the first 1 N·s of each hit, and tough materials need several big impulses. |
+| Spring force (Hooke's law) | `F = k × x` | The slingshot band is a spring with k = 100 N/m that pushes the ball every physics step until it passes the rest point. |
+| Energy → speed | `½kx² = ½mv²` | The same pull gives every ball the same energy, so light balls (Zip 0.5 kg) fly faster than heavy ones (Chonk 2 kg). |
+| Momentum | `p = m × v` | Heavy balls are slower but carry more momentum, so they shove heavy things around. |
+| Impulse | `J = F × Δt` | Damage is the collision impulse read from the physics solver. Foam soaks up the first 1 N·s of each hit; tough materials need several big impulses. |
 | Gravity & torque | `τ = F × d` | Hitting a tall tower high up tips it over, and gravity does the rest. |
-
-Each of the 5 levels teaches one idea:
-
-1. **Stretch It!** Hooke's law
-2. **Mass Matters** mass, speed & momentum
-3. **Tough Stuff** impulse & repeated force
-4. **Topple Tower** gravity & torque
-5. **Pup Fortress** put it all together
-
-After each level, the **Lab Report** shows your strongest pull, fastest launch, most
-momentum and hardest hit, plus a "What we learned" summary.
-
-*Try it with the real slingshot:* pull the pouch back 5, 10 and 15 cm and measure how far
-the foam ball flies. Then try a bigger ball with the same pull. Does it match the game?
 
 ## How it was made
 
@@ -80,7 +86,7 @@ the foam ball flies. Then try a bigger ball with the same pull. Does it match th
 index.html            screens + HUD markup
 css/style.css         mobile-first styles (portrait control deck, landscape HUD)
 js/sim.js             physics + rules (no DOM, shared with the Node tests)
-js/levels.js          the 5 levels and their science text
+js/levels.js          the 5 levels and their kid-friendly science text
 js/game.js            renderer, camera, touch input, particles
 js/main.js            screens, Force Lab panel, lab reports, saved progress
 js/audio.js           Web Audio sound effects and music

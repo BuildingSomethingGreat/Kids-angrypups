@@ -32,6 +32,18 @@
     lastTime: 0,
   };
 
+  // ---------- kid-friendly "more or less" words for the physics numbers
+  G.WORDS = {
+    pull: [[0.05, 'none'], [0.3, 'a little'], [0.6, 'some'], [0.9, 'a lot'], [Infinity, 'all the way!']],
+    push: [[0.05, 'none'], [0.3, 'small'], [0.6, 'medium'], [0.9, 'big'], [Infinity, 'HUGE!']],
+    speed: [[0.5, '–'], [9, 'slow'], [16, 'medium'], [23, 'fast'], [Infinity, 'super fast!']],
+    hit: [[1, '–'], [3, 'tap'], [6, 'bonk'], [10, 'BAM!'], [Infinity, 'KABOOM!']],
+  };
+  G.word = function (value, scale) {
+    for (var i = 0; i < scale.length; i++) if (value < scale[i][0]) return scale[i][1];
+    return scale[scale.length - 1][1];
+  };
+
   // ---------- tiny event emitter
   G.on = function (name, fn) { (G.listeners[name] = G.listeners[name] || []).push(fn); };
   G.emit = function (name, data) { (G.listeners[name] || []).forEach(function (fn) { fn(data); }); };
@@ -381,7 +393,8 @@
             G.shake = Math.min(14, G.shake + e.imp * 0.6);
           }
           if (e.ball && e.imp > 2.5) {
-            popup(e.x, e.y + 0.4, e.imp.toFixed(1) + ' N·s', { size: 0.34, color: '#ffe066', stroke: '#3b1d5e', life: 1.0, vy: 1.6 });
+            var hw = G.word(e.imp, G.WORDS.hit);
+            if (hw !== 'tap') popup(e.x, e.y + 0.4, hw === 'bonk' ? 'BONK!' : hw, { size: e.imp > 10 ? 0.5 : 0.4, color: '#ffe066', stroke: '#3b1d5e', life: 1.0, vy: 1.6 });
             if (G.lastShot) G.lastShot.impulse = Math.max(G.lastShot.impulse || 0, e.imp);
             if (e.imp > 6) addP({ kind: 'ring', x: e.x, y: e.y, size: 0.2, grow: 3 + k * 4, life: 0.35 });
           }
@@ -854,6 +867,7 @@
     var c = w2s((ANCHORS[0].x + ANCHORS[1].x) / 2, ANCHORS[0].y + 0.75);
     var w = 164, h = 46;
     var x = Math.round(c[0] - w / 2), y = Math.round(c[1] - h);
+    x = Math.max(8, Math.min(G.W - w - 8, x));
     if (y < 64) y = 64;
     ctx.save();
     ctx.fillStyle = 'rgba(28,16,48,0.82)';
@@ -862,11 +876,10 @@
     ctx.font = '17px "Lilita One", system-ui, sans-serif';
     ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('F = ' + Math.round(li.F) + ' N', x + 10, y + 15);
+    ctx.fillText('Push:', x + 10, y + 15);
     ctx.textAlign = 'right';
-    ctx.fillStyle = '#ffc6ec';
-    ctx.font = '13px Nunito, system-ui, sans-serif';
-    ctx.fillText('x = ' + li.x.toFixed(2) + ' m', x + w - 10, y + 15);
+    ctx.fillStyle = frac > 0.9 ? '#ffd23f' : '#ffc6ec';
+    ctx.fillText(G.word(frac, G.WORDS.push), x + w - 10, y + 15);
     // meter in the slingshot's own pink/purple
     var bx = x + 10, by = y + 28, bw = w - 20, bh = 8;
     ctx.fillStyle = 'rgba(255,255,255,0.15)';

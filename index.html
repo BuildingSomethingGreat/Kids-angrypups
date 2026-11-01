@@ -37,7 +37,7 @@
     <div class="title-shade"></div>
     <div class="title-content">
       <img class="logo" src="assets/img/logo.webp" alt="Angry Pups" width="900" height="606">
-      <p class="tagline">A <b>force &amp; motion</b> science fair game</p>
+      <p class="tagline">A science fair game about <b>force</b>: pushes &amp; pulls!</p>
       <button id="btn-play" class="cta" type="button">
         <svg><use href="#i-play"/></svg><span>PLAY</span>
       </button>
@@ -45,6 +45,7 @@
         <button id="btn-science" class="pill" type="button"><svg><use href="#i-flask"/></svg>The Science</button>
         <button class="pill btn-sound" type="button" aria-label="Sound on or off"><svg><use href="#i-sound"/></svg></button>
       </div>
+      <p class="rotate-blurb"><svg><use href="#i-rotate"/></svg>Tip: turn your phone sideways for the best view!</p>
     </div>
     <p class="title-credit">Characters, foam and slingshot based on our real science fair build</p>
   </section>
@@ -55,8 +56,8 @@
     <header class="levels-head">
       <button class="round" id="btn-levels-back" type="button" aria-label="Back"><svg><use href="#i-back"/></svg></button>
       <div>
-        <h2>Choose an experiment</h2>
-        <p>Each level tests a different force idea</p>
+        <h2>Pick a level</h2>
+        <p>Each level teaches one big idea about force</p>
       </div>
     </header>
     <div id="level-grid" class="level-grid"></div>
@@ -83,13 +84,11 @@
           <svg><use href="#i-flask"/></svg><span>Force Lab</span><i class="chev"></i>
         </button>
         <div class="lab-body">
-          <div class="lab-row"><span>Ball</span><b id="lab-ball">Bop · m = 1.0 kg</b></div>
-          <div class="lab-row"><span>Stretch</span><b id="lab-x">x = 0.00 m</b></div>
-          <div class="lab-row hl"><span>Force</span><b id="lab-f">F = k·x = 0 N</b></div>
-          <div class="lab-row"><span>Accel.</span><b id="lab-a">a = F/m = 0 m/s²</b></div>
-          <div class="lab-row"><span>Launch</span><b id="lab-v">v = 0.0 m/s</b></div>
-          <div class="lab-row"><span>Momentum</span><b id="lab-p">p = m·v = 0.0</b></div>
-          <div class="lab-row"><span>Impact</span><b id="lab-j">J = –</b></div>
+          <div class="lab-row"><span>Ball</span><b id="lab-ball">Bop · medium</b></div>
+          <div class="lab-row keep"><span>Pull</span><b><i class="meter"><i id="lab-pull-bar"></i></i><em id="lab-pull">none</em></b></div>
+          <div class="lab-row hl"><span>Push</span><b><i class="meter"><i id="lab-push-bar"></i></i><em id="lab-push">none</em></b></div>
+          <div class="lab-row"><span>Speed</span><b><i class="meter"><i id="lab-speed-bar"></i></i><em id="lab-speed">–</em></b></div>
+          <div class="lab-row"><span>Hit</span><b><i class="meter"><i id="lab-hit-bar"></i></i><em id="lab-hit">–</em></b></div>
         </div>
       </aside>
     </div>
@@ -101,6 +100,16 @@
   <div id="modal" class="modal" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true">
       <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ============ TURN SIDEWAYS (phones held upright) ============ -->
+  <div id="rotate-gate" class="rotate-gate" aria-hidden="true">
+    <div class="rg-card" role="dialog" aria-modal="true" aria-labelledby="rg-title">
+      <div class="rg-phone"><span></span></div>
+      <h3 id="rg-title">Turn your phone sideways!</h3>
+      <p>Angry Pups is more fun with your phone turned sideways. You can see the whole level at once.</p>
+      <button class="btn ghost" id="rg-skip" type="button">Play this way</button>
     </div>
   </div>
 

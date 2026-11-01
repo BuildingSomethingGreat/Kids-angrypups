@@ -37,6 +37,12 @@ async function run(name, viewport, opts) {
   await page.screenshot({ path: `${OUT}/${name}-1-title.png` });
 
   await page.click('#btn-play', { force: true });
+  await page.waitForTimeout(600);
+  // Phones held upright first see the "turn your phone sideways" prompt.
+  if (await page.isVisible('#rotate-gate.show')) {
+    await page.screenshot({ path: `${OUT}/${name}-1b-rotate.png` });
+    await page.click('#rg-skip');
+  }
   await page.waitForTimeout(1500);
   await page.screenshot({ path: `${OUT}/${name}-2-mission.png` });
   await page.click('[data-act="go"]', { force: true });
