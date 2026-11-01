@@ -18,8 +18,10 @@ The game is plain HTML/CSS/JavaScript with no build step.
 - **Quickest:** open `index.html` in a browser (works straight from the folder).
 - **On a phone over Wi-Fi:** from this folder run `python3 -m http.server 8000`, then open
   `http://<your-computer's-IP>:8000` on the phone.
-- **Publish it:** push to GitHub and turn on **Settings → Pages → Deploy from branch**
-  (root folder). Any static host (Netlify, Vercel, Cloudflare Pages) works too.
+- **Online:** https://buildingsomethinggreat.github.io/Kids-angrypups/
+  Every push redeploys automatically through `.github/workflows/deploy-pages.yml`, which
+  first re-runs the physics checks. (One-time setup: **Settings → Pages → Source: GitHub
+  Actions**.) Any static host (Netlify, Vercel, Cloudflare Pages) works too.
 - On a phone you can **Add to Home Screen** and it opens full-screen like an app.
 
 **How to play:** drag back on the foam ball in the slingshot and let go. Pick a ball
