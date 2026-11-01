@@ -130,6 +130,7 @@
     .photos figure:nth-child(odd) { transform: rotate(-1.2deg); }
     .photos figure:nth-child(even) { transform: rotate(1.4deg); }
     .photos img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 3px; }
+    .photos video { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 3px; background: #24123f; }
     .photos img.fit { aspect-ratio: 3 / 4; object-fit: contain; background: #24123f; }
     .photos figcaption { margin-top: 6px; font-family: var(--hand); font-size: 17px; text-align: center; line-height: 1.2; }
 
@@ -217,6 +218,10 @@
     .cta:active { transform: translateY(4px); box-shadow: 0 2px 0 #7a0c4c; }
     footer { margin-top: 40px; text-align: center; font-size: 13px; font-weight: 700; color: rgba(255, 255, 255, .55); }
 
+    @media (max-width: 719px) {
+      .photos figure.span { grid-column: 1 / -1; transform: rotate(-.6deg); }
+      .photos figure.span img { aspect-ratio: auto; }
+    }
     @media (min-width: 720px) {
       .photos.three { grid-template-columns: repeat(3, 1fr); }
       .paper { padding: 26px 28px; }
@@ -386,12 +391,16 @@
       <div class="paper">
         <p class="say quote">And he also made a whole game about it.</p>
         <p class="note">In <b>Angry Pups</b>, you pull back a launcher just like my real one. The Pull meter even uses <b>low, medium and large</b>, just like my experiment. The pups and foam balls in the game look like my real toys!</p>
-        <div class="photos">
+        <div class="photos three">
+          <figure>
+            <video id="play-clip" src="assets/bts/playing-the-game.mp4" poster="assets/bts/playing-the-game-poster.webp" autoplay muted loop playsinline preload="metadata" aria-label="Short clip of me playing Angry Pups on a phone"></video>
+            <figcaption>Me playing Angry Pups!</figcaption>
+          </figure>
           <figure>
             <img src="assets/bts/game-on-ipad.webp" alt="The Angry Pups title screen on a tablet" loading="lazy" width="825" height="1100">
             <figcaption>Angry Pups on our tablet</figcaption>
           </figure>
-          <figure>
+          <figure class="span">
             <img class="fit" src="assets/bts/game-characters.webp" alt="The game's pup characters, foam ball characters and launcher" loading="lazy">
             <figcaption>My toys turned into game characters</figcaption>
           </figure>
@@ -460,6 +469,12 @@
       area.appendChild(groups);
       plot.appendChild(y);
       plot.appendChild(area);
+
+      // Respect reduced motion: no autoplaying video, just a play button.
+      var clip = document.getElementById('play-clip');
+      if (clip && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        clip.removeAttribute('autoplay'); clip.pause(); clip.controls = true;
+      }
 
       // Two pup sprites from the game's atlas for the final message.
       var A = window.AP && window.AP.ATLAS;
